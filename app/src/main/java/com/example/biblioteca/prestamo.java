@@ -72,6 +72,11 @@ public class prestamo extends AppCompatActivity {
                 sw = 0;
             }else if(sw == 0){
                 Toast.makeText(this, "Prestamo Disponible!", Toast.LENGTH_SHORT).show();
+                jetcodLibro.setText("");
+                jetcliente.setText("");
+
+                jetfecha.setText("");
+
                 jetfecha.requestFocus();
             }else{
                 Toast.makeText(this, "Prestamo Actualmente Anulado!", Toast.LENGTH_SHORT).show();
@@ -115,6 +120,9 @@ public class prestamo extends AppCompatActivity {
                     resp = db2.insert("TblPrestamos",null,regis);
                     if(resp > 0){
                         Toast.makeText(this, "Prestamo Guardado Exitosamente!", Toast.LENGTH_SHORT).show();
+                        ContentValues regis2 = new ContentValues();
+                        regis2.put("activo","no");
+                        resp = db.update("TblLibros",regis2,"cod_libro = '" + codLibro + "'",null);
                         limpiar();
 
                     }else{
@@ -126,7 +134,7 @@ public class prestamo extends AppCompatActivity {
                 db2.close();
 
             }else{
-                Toast.makeText(this, "El Libro No Existe En La Base De Datos o Esta Anulado!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "El Libro No Existe En La Base De Datos o No Esta Disponible!", Toast.LENGTH_SHORT).show();
                 jetcodLibro.requestFocus();
             }
             db.close();
@@ -134,7 +142,7 @@ public class prestamo extends AppCompatActivity {
     }
     public void anular(View view){
         String codPrestamo = jetcodPrestamo.getText().toString();
-        consultarCodPrestamo();
+        Cursor fil = consultarCodPrestamo();
         if(codPrestamo.isEmpty()){
             Toast.makeText(this, "Debes Ingresar Un Codigo!", Toast.LENGTH_SHORT).show();
             jetcodPrestamo.requestFocus();
@@ -147,6 +155,10 @@ public class prestamo extends AppCompatActivity {
                 resp = db.update("TblPrestamos",anul,"cod_prestamo = '" + codPrestamo + "'",null);
                 if(resp  > 0){
                     Toast.makeText(this, "Prestamo Anulado Satisfactoriamente!", Toast.LENGTH_SHORT).show();
+                    ContentValues anul2 = new ContentValues();
+                    anul2.put("activo","si");
+                    resp = db.update("TblLibros",anul2,"cod_libro = '" + fil.getString(3) + "'",null);
+                    limpiar();
                 }else{
                     Toast.makeText(this, "Error Al Anular Prestamo", Toast.LENGTH_SHORT).show();
                 }
